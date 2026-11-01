@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nishanth Thiyakarajan | Portfolio</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        primary: '#38bdf8',
+                        secondary: '#f472b6',
+                        tertiary: '#4ade80'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Animations */
+        body {
+            background-color: #050810; /* Deep Space Background */
+            color: #f8fafc;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { @apply bg-transparent; }
+        ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-md; }
+        ::-webkit-scrollbar-thumb:hover { @apply bg-slate-600; }
+
+        /* Reveal Animation on Scroll (Staggered & Smooth) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+
+        /* Elevation & Colored Glow Hover Effect */
+        .hover-card {
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .hover-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(66, 138, 255, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+        .hover-card:hover::before {
+            opacity: 10;
+        }
+        .hover-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glowing Background Blob Effects */
+        @keyframes float-1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, -5%) scale(1.1); }
+            66% { transform: translate(-3%, 3%) scale(0.9); }
+        }
+        @keyframes float-2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5%, 5%) scale(1.2); }
+            66% { transform: translate(3%, -3%) scale(0.8); }
+        }
+
+        .blob-1, .blob-2 {
+            position: fixed;
+            border-radius: 50%;
+            z-index: -10;
+            pointer-events: none;
+            filter: blur(60px);
+        }
+        .blob-1 {
+            top: -10%; left: -10%; width: 50vw; height: 50vw; min-width: 400px; min-height: 400px;
+            background: radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(15,23,42,0) 70%);
+            animation: float-1 15s ease-in-out infinite;
+        }
+        .blob-2 {
+            bottom: -10%; right: -10%; width: 60vw; height: 60vw; min-width: 500px; min-height: 500px;
+            background: radial-gradient(circle, rgba(139,92,246,0.20) 0%, rgba(15,23,42,0) 70%);
+            animation: float-2 18s ease-in-out infinite;
+        }
+
+        /* Gradient Text Utility */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #3b82f6, #8b5cf6);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden relative text-slate-50">
+
+    <!-- Galaxy Canvas Background -->
+    <canvas id="galaxy-canvas" class="fixed inset-0 z-[-20] w-full h-full"></canvas>
+
+    <!-- Ambient Dynamic Background Blobs -->
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed w-full z-50 top-0 bg-slate-900/50 backdrop-blur-md border-b border-slate-800 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#home" class="text-2xl font-bold tracking-tighter hover:opacity-80 transition">
+                        Nishanth<span class="text-tertiary">.</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#home" class="text-slate-300 hover:text-white transition font-medium text-sm">Home</a>
+                    <a href="#about" class="text-slate-300 hover:text-white transition font-medium text-sm">My Odyssey</a>
+                    <a href="#experience" class="text-slate-300 hover:text-white transition font-medium text-sm">Experience</a>
+                    <a href="#education" class="text-slate-300 hover:text-white transition font-medium text-sm">Background</a>
+                    <a href="#skills" class="text-slate-300 hover:text-white transition font-medium text-sm">Proficiencies</a>
+                    
+                    <a href="#contact" class="bg-tertiary hover:bg-blue-700 hover:text-white font-bold text-black px-5 py-2 rounded-full font-medium transition shadow-lg shadow-blue-200/30 text-sm">
+                        Let's Connect
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center space-x-4">
+                    <button id="mobile-menu-btn" class="text-slate-300 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 backdrop-blur-md border-b border-slate-800 absolute w-full left-0 top-20 shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-1 flex flex-col">
+                <a href="#home" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 transition">Home</a>
+                <a href="#about" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 transition">My Odyssey</a>
+                <a href="#experience" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 transition">Experience</a>
+                <a href="#education" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 transition">Background</a>
+                <a href="#skills" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800 transition">Proficiencies</a>
+                <a href="#contact" class="mobile-link mt-4 block text-center bg-primary hover:bg-blue-600 text-white px-5 py-3 rounded-md font-medium transition">Let's Connect</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden bg-transparent">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
+                <div class="text-center max-w-4xl mx-auto reveal active">
+                    <p class="text-primary font-semibold tracking-wide mb-4 text-sm sm:text-base uppercase">Welcome to my portfolio</p>
+                    <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-white">
+                        Hi, I'm <br class="sm:hidden" />
+                        <span class="text-gradient">Nishanth Thiyakarajan</span>
+                    </h1>
+                    <h2 class="text-2xl sm:text-3xl text-slate-400 font-medium mb-4">
+                        Functional Consultant & AI Enthusiast
+                    </h2>
+                    <div class="inline-flex items-center bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-2 mb-8 shadow-sm">
+                        <i class="fas fa-star text-primary mr-2 text-sm"></i>
+                        <span class="text-primary font-bold text-sm tracking-wide uppercase">5+ Years of Experience</span>
+                    </div>
+                    <p class="text-lg text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                        Specializing in Order-to-Cash (O2C) solutions and data analysis, with a passionate drive towards building the future through Agentic Artificial Intelligence.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 bg-transparent relative border-t border-slate-800/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="reveal">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center text-white">My <span class="text-gradient">Odyssey</span></h2>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-5 reveal">
+                        <!-- Abstract Visual representation since we don't have a photo -->
+                        <div class="relative w-full aspect-square rounded-2xl overflow-hidden border border-slate-700 bg-slate-800/60 backdrop-blur-md flex items-center justify-center group hover-card">
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <i class="fas fa-user-astronaut text-8xl text-slate-400 group-hover:text-primary transition-colors duration-500 drop-shadow-2xl"></i>
+                            
+                            <!-- Decorative elements -->
+                            <div class="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-primary rounded-tl-xl opacity-50"></div>
+                            <div class="absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2 border-secondary rounded-br-xl opacity-50"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-7 space-y-6 reveal delay-100">
+                        <h3 class="text-2xl font-semibold text-white">Bridging Enterprise Solutions and Artificial Intelligence</h3>
+                        <p class="text-slate-400 text-lg leading-relaxed">
+                            I am a detail-oriented Functional Consultant with a proven track record in streamlining financial workflows. My core expertise lies in Order-to-Cash (O2C) solutions, Cash Application automation, and seamless ERP integrations. I thrive on transforming complex data into actionable insights to drive business efficiency.
+                        </p>
+                        <p class="text-slate-400 text-lg leading-relaxed">
+                            Beyond enterprise consulting, I am deeply passionate about the frontier of technology. I am currently advancing my knowledge by pursuing a degree in Artificial Intelligence, with a specialized focus on <strong class="text-white">Agentic AI</strong>. I believe in the power of autonomous AI agents to revolutionize how we approach problem-solving and software development.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6">
+                            <div class="bg-slate-800/60 backdrop-blur-md p-5 rounded-xl border border-slate-700 hover-card">
+                                <i class="fas fa-briefcase text-3xl text-primary mb-3"></i>
+                                <h4 class="text-white font-semibold mb-1">Experience</h4>
+                                <p class="text-slate-400 text-sm">5+ Years working with Enterprise IT & Consulting.</p>
+                            </div>
+                            <div class="bg-slate-800/60 backdrop-blur-md p-5 rounded-xl border border-slate-700 hover-card">
+                                <i class="fas fa-robot text-3xl text-secondary mb-3"></i>
+                                <h4 class="text-white font-semibold mb-1">AI Focus</h4>
+                                <p class="text-slate-400 text-sm">Machine Learning, Deep Learning, Gen AI and Agentic AI.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-24 bg-transparent relative">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="reveal text-center mb-20">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">Professional <span class="text-gradient">Experience</span></h2>
+                    <p class="text-slate-400">My journey in enterprise technology and consulting.</p>
+                </div>
+
+                <div class="relative w-full space-y-16">
+                    <!-- Central Track Line -->
+                    <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-700 transform -translate-x-1/2 z-0"></div>
+
+                    <!-- Experience 1: HighRadius -->
+                    <div class="relative flex flex-col md:flex-row items-center justify-between w-full reveal">
+                        <!-- Horizontal Connecting Line -->
+                        <div class="hidden md:block absolute left-[45%] right-[45%] h-0.5 bg-slate-700 z-0"></div>
+                        
+                        <!-- Left Box: Role & Company -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card md:text-right mb-6 md:mb-0 z-10 relative">
+                            <h3 class="text-xl font-bold text-white">Functional Consultant</h3>
+                            <h4><a href="https://www.highradius.com/" target="_blank" rel="noopener noreferrer" class="text-primary font-medium hover:underline">HighRadius Technologies</a></h4>
+                            <span class="text-sm text-slate-400 inline-block mt-1">Present</span>
+                        </div>
+                        
+                        <!-- Center Dot -->
+                        <div class="hidden md:block absolute left-1/2 -ml-2 w-4 h-4 rounded-full bg-primary ring-4 ring-[#050810] z-20 reveal delay-100"></div>
+                        
+                        <!-- Right Box: Summary -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card text-left z-10 reveal delay-200 relative">
+                            <div class="text-slate-400 text-sm space-y-3">
+                                <p>Implemented and optimized end-to-end Order-to-Cash (O2C) solutions for enterprise clients, focusing on automating Cash Application processes to significantly streamline invoicing and payment workflows.</p>
+                                <p>Led seamless ERP integrations to ensure consistent and accurate financial data synchronization across systems, while providing strategic client account management and specialized functional consulting.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience 2: AgileServ -->
+                    <div class="relative flex flex-col md:flex-row items-center justify-between w-full reveal">
+                        <!-- Horizontal Connecting Line -->
+                        <div class="hidden md:block absolute left-[45%] right-[45%] h-0.5 bg-slate-700 z-0"></div>
+                        
+                        <!-- Left Box: Summary (Alternating) -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card md:text-right z-10 mb-6 md:mb-0 order-2 md:order-1 relative">
+                            <div class="text-slate-400 text-sm space-y-3">
+                                <p>Spearheaded critical data migration initiatives and maintained robust ETL data pipelines, ensuring seamless transitions and high data integrity across enterprise systems.</p>
+                                <p>Managed incident tracking and resolution workflows utilizing Jira and ServiceNow, deploying critical system upgrades to ensure high availability and performance stability.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Center Dot -->
+                        <div class="hidden md:block absolute left-1/2 -ml-2 w-4 h-4 rounded-full bg-secondary ring-4 ring-[#050810] z-20 order-1 md:order-2 reveal delay-100"></div>
+                        
+                        <!-- Right Box: Role & Company -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card text-left z-10 order-1 md:order-3 mb-6 md:mb-0 reveal delay-200 relative">
+                            <h3 class="text-xl font-bold text-white">Technical Support Analyst</h3>
+                            <h4><a href="https://agileserv.com/" target="_blank" rel="noopener noreferrer" class="text-secondary font-medium hover:underline">AgileServ Solutions</a></h4>
+                            <span class="text-sm text-slate-400 inline-block mt-1"><i class="far fa-calendar-alt mr-1"></i> Jun 2023 - Jun 2024</span>
+                        </div>
+                    </div>
+
+                    <!-- Experience 3: TCS -->
+                    <div class="relative flex flex-col md:flex-row items-center justify-between w-full reveal">
+                        <!-- Horizontal Connecting Line -->
+                        <div class="hidden md:block absolute left-[45%] right-[45%] h-0.5 bg-slate-700 z-0"></div>
+                        
+                        <!-- Left Box: Role & Company -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card md:text-right mb-6 md:mb-0 z-10 relative">
+                            <h3 class="text-xl font-bold text-white">Assistant System Engineer</h3>
+                            <h4><a href="https://www.tcs.com/" target="_blank" rel="noopener noreferrer" class="text-tertiary font-semibold hover:underline">Tata Consultancy Services</a></h4>
+                            <span class="text-sm text-slate-400 inline-block mt-1"><i class="far fa-calendar-alt mr-1"></i> May 2021 - Jun 2023</span>
+                        </div>
+                        
+                        <!-- Center Dot -->
+                        <div class="hidden md:block absolute left-1/2 -ml-2 w-4 h-4 rounded-full bg-tertiary ring-4 ring-[#050810] z-20 reveal delay-100"></div>
+                        
+                        <!-- Right Box: Summary -->
+                        <div class="w-full md:w-[45%] bg-slate-800/60 backdrop-blur-md p-6 rounded-xl border border-slate-700 hover-card text-left z-10 reveal delay-200 relative">
+                            <div class="text-slate-400 text-sm space-y-3">
+                                <p>Monitored and extracted enterprise SQL metrics for proactive database performance analysis, while administering critical batch job scheduling to ensure successful execution.</p>
+                                <p>Performed secure server maintenance and remote troubleshooting utilizing PuTTY and WinSCP. Navigated Change Advisory Board clearances for seamless deployments.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-24 bg-slate-900/50 border-y border-slate-800 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="reveal text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4">Academic <span class="text-gradient">Background</span></h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <!-- Education 1 -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 reveal relative overflow-hidden group hover-card">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-brain text-8xl text-primary"></i>
+                        </div>
+                        <span class="bg-blue-500/20 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Currently Pursuing</span>
+                        <h3 class="text-2xl font-bold text-white mb-2">Degree in Artificial Intelligence</h3>
+                        <p class="text-primary font-medium mb-4">Specialization: Agentic AI</p>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 mb-4">
+                            Deep diving into the architectures of autonomous agents, Large Language Models (LLMs), and frameworks that enable AI to plan, execute, and adapt complex tasks dynamically.
+                        </p>
+                        <ul class="text-slate-400 text-sm leading-relaxed relative z-10 space-y-2">
+                            <li class="flex items-start"><i class="fas fa-check-circle text-primary mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Core Focus:</strong> Machine Learning, Deep Learning, Neural Networks, Natural Language Processing (NLP), Prompt Engineering, and GenAI.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check-circle text-primary mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Practical Application:</strong> Actively building foundational knowledge to soon design and deploy multi-agent systems using frameworks like CrewAI and AutoGen.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check-circle text-primary mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Research Areas:</strong> Applying AI assistants like Gemini, GitHub Copilot, and Claude to enhance workflows and streamline tasks in professional enterprise environments.</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Education 2 -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 reveal relative overflow-hidden group hover-card">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-graduation-cap text-8xl text-slate-400"></i>
+                        </div>
+                        <span class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Completed</span>
+                        <h3 class="text-2xl font-bold text-white mb-2">Bachelor's Degree</h3>
+                        <p class="text-slate-400 font-medium mb-4">Engineering / Technology</p>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 mb-4">
+                            Foundational education in computer science, software engineering principles, and analytical problem-solving which laid the groundwork for my career in IT consulting and AI.
+                        </p>
+                        <ul class="text-slate-400 text-sm leading-relaxed relative z-10 space-y-2">
+                            <li class="flex items-start"><i class="fas fa-check-circle text-slate-500 mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Key Coursework:</strong> Programming Languages, Data Structures, Database Management Systems, System Designs, and Advanced Mathematics.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check-circle text-slate-500 mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Skill Development:</strong> Honed algorithmic thinking, logical reasoning, and object-oriented programming capabilities.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check-circle text-slate-500 mt-1 mr-2 text-xs"></i><span><strong class="text-slate-300 font-medium">Academic Projects:</strong> Completed extensive AI-driven capstone projects focusing on Machine Learning and Deep Learning technologies.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="reveal text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4">Core Skills & <span class="text-gradient">Proficiencies</span></h2>
+                    <p class="text-slate-400">Comprehensive toolkit across consulting, data, and leadership.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    
+                    <!-- Technical Stack & Data -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 hover-card reveal">
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center mb-6">
+                            <i class="fas fa-database text-xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700 pb-3">Technical Stack & Data</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Python</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">SQL</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">MongoDB</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Machine Learning</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">ETL Pipelines</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Data Analytics</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Data Modeling</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Power BI</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">LangChain</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Ollama</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Gemini</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Claude</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-primary transition cursor-default">Copilot</span>
+                        </div>
+                    </div>
+
+                    <!-- Enterprise & Domain -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 hover-card reveal delay-100">
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-6">
+                            <i class="fas fa-building text-xl text-secondary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700 pb-3">Enterprise & Domain</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">HighRadius SaaS</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">Salesforce</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">SharePoint</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">Order-to-Cash (O2C)</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">Accounts Receivable</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">ERP Integrations</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">Finance Transformation</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-secondary transition cursor-default">Billing & Invoicing</span>
+                        </div>
+                    </div>
+
+                    <!-- Consulting & Operations -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 hover-card reveal delay-100">
+                        <div class="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center mb-6">
+                            <i class="fas fa-project-diagram text-xl text-teal-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700 pb-3">Consulting & Operations</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Functional Consulting</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Project Management</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Stakeholder Management</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Production & Hypercare Support</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Incident Management</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Data Migration</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Requirements Gathering</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Process Optimization</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">ServiceNow & Jira</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Confluence</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-teal-400 transition cursor-default">Unix / Linux</span>
+                        </div>
+                    </div>
+
+                    <!-- Leadership & Soft Skills -->
+                    <div class="bg-card p-8 rounded-2xl border border-slate-700 hover-card reveal delay-200">
+                        <div class="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-6">
+                            <i class="fas fa-users text-xl text-orange-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700 pb-3">Leadership & Soft Skills</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Team Leadership</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Mentoring</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Client Communication</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Cross-functional Teamwork</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Strategic Problem-Solving</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Adaptability</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Critical Thinking</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Decision Making</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Time Management</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Conflict Resolution</span>
+                            <span class="px-4 py-2 bg-dark border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-orange-400 transition cursor-default">Customer Success</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 relative">
+            <div class="reveal text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-slate-900 dark:text-white">Let's <span class="text-gradient">Connect</span></h2>
+                <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Whether you have a question, a project idea, or just want to say hi, I'll try my best to get back to you!</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto">
+                <!-- Contact Form -->
+                <div class="bg-slate-800/60 backdrop-blur-md p-8 rounded-2xl border border-slate-700 hover-card reveal">
+                    <form id="contact-form" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Your Name</label>
+                                <input type="text" name="name" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Your Email</label>
+                                <input type="email" name="email" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Inquiry Type</label>
+                                <select name="inquiry_type" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                                    <option value="Networking" class="bg-slate-800">Networking</option>
+                                    <option value="Job Opportunity" class="bg-slate-800">Job Opportunity</option>
+                                    <option value="Project Collaboration" class="bg-slate-800">Project Collaboration</option>
+                                    <option value="Consulting" class="bg-slate-800">Consulting</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Company (Optional)</label>
+                                <input type="text" name="company" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Phone (Optional)</label>
+                            <input type="tel" name="phone" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Message</label>
+                            <textarea name="message" rows="4" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="submit-btn" class="w-full bg-tertiary hover:bg-blue-700 hover:text-white font-bold text-black py-3 px-4 rounded-lg transition-colors flex justify-center items-center">
+                            <span>Send Message</span> <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                        
+                        <div id="form-message" class="hidden mt-4 p-4 rounded-lg text-center text-sm"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer with Social Icons -->
+    <footer class="bg-transparent py-8 border-t border-slate-800/50 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-slate-500 dark:text-slate-400 text-sm mb-6 md:mb-0">
+                &copy; <span id="year"></span> Nishanth Thiyakarajan. All rights reserved.
+            </div>
+            <div class="flex space-x-6">
+                <a href="mailto:nishanth.thiyakarajan@gmail.com" class="text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition transform hover:scale-110">
+                    <i class="fas fa-envelope text-2xl"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/nishanth-thiyakarajan/" target="_blank" class="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition transform hover:scale-110">
+                    <i class="fab fa-linkedin text-2xl"></i>
+                </a>
+                <a href="https://wa.me/+919976738856" target="_blank" class="text-slate-500 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-400 transition transform hover:scale-110">
+                    <i class="fab fa-whatsapp text-2xl"></i>
+                </a>
+                <a href="https://www.instagram.com/nishanth_thiyakarajan" target="_blank" class="text-slate-500 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 transition transform hover:scale-110">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => menu.classList.add('hidden'));
+        });
+        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+
+        // Navbar Shadow on Scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+        });
+
+        // Intersection Observer Reveal
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        revealElements.forEach(el => observer.observe(el));
+
+        // Form Submit
+        const form = document.getElementById('contact-form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const msg = document.getElementById('form-message');
+                msg.textContent = "Connecting to n8n webhook...";
+                msg.className = "mt-4 p-4 bg-blue-500/20 text-blue-500 rounded-lg text-center text-sm block";
+                setTimeout(() => {
+                    msg.textContent = "Setup required: Point the fetch URL to your n8n workflow!";
+                    msg.className = "mt-4 p-4 bg-yellow-500/20 text-yellow-400 rounded-lg text-center text-sm block";
+                }, 1500);
+            });
+        }
+
+        // Galaxy Canvas Animation
+        const canvas = document.getElementById('galaxy-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5,
+                    vx: (Math.random() - 0.5) * 0.15,
+                    vy: (Math.random() - 0.5) * 0.15,
+                    alpha: Math.random(),
+                    dAlpha: (Math.random() * 0.015) - 0.0075
+                });
+            }
+        }
+        
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+                
+                // Wrap around edges
+                if (star.x < 0) star.x = width;
+                if (star.x > width) star.x = 0;
+                if (star.y < 0) star.y = height;
+                if (star.y > height) star.y = 0;
+                
+                // Twinkle effect
+                star.alpha += star.dAlpha;
+                if (star.alpha <= 0.1 || star.alpha >= 1) {
+                    star.dAlpha *= -1;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animateStars();
+    </script>
+</body>
+</html>
