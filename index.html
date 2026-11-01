@@ -510,6 +510,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-400 mb-2">Inquiry Type</label>
                                 <select name="inquiry_type" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition">
+                                    <option value="" disabled selected hidden>Select from below</option>
                                     <option value="Networking" class="bg-slate-800">Networking</option>
                                     <option value="Job Opportunity" class="bg-slate-800">Job Opportunity</option>
                                     <option value="Project Collaboration" class="bg-slate-800">Project Collaboration</option>
@@ -599,18 +600,52 @@
         }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
         revealElements.forEach(el => observer.observe(el));
 
-        // Form Submit
+        // Form Submit to n8n Webhook
         const form = document.getElementById('contact-form');
-        if (form) {
-            form.addEventListener('submit', (e) => {
+        if (form) 
+        {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const msg = document.getElementById('form-message');
-                msg.textContent = "Connecting to n8n webhook...";
-                msg.className = "mt-4 p-4 bg-blue-500/20 text-blue-500 rounded-lg text-center text-sm block";
-                setTimeout(() => {
-                    msg.textContent = "Setup required: Point the fetch URL to your n8n workflow!";
-                    msg.className = "mt-4 p-4 bg-yellow-500/20 text-yellow-400 rounded-lg text-center text-sm block";
-                }, 1500);
+                const submitBtn = document.getElementById('submit-btn');
+                
+                // Collect form data
+                const formData = {
+                    name: form.name.value,
+                    email: form.email.value,
+                    inquiry_type: form.inquiry_type.value,
+                    company: form.company.value,
+                    phone: form.phone.value,
+                    message: form.message.value
+                };
+
+                msg.textContent = "Sending message...";
+                msg.className = "mt-4 p-4 bg-blue-500/20 text-blue-400 rounded-lg text-center text-sm block";
+                submitBtn.disabled = true;
+
+                try {
+                    // Replace with your actual n8n Webhook URL (e.g., http://<your-ec2-ip>:5678/webhook/contact-form)
+                    const response = await fetch('http://18.234.87.204:5678/webhook-test/contact-form', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        msg.textContent = "Message sent successfully! I'll get back to you soon.";
+                        msg.className = "mt-4 p-4 bg-green-500/20 text-green-400 rounded-lg text-center text-sm block";
+                        form.reset();
+                    } else {
+                        throw new Error('Server returned an error');
+                    }
+                } catch (error) {
+                    msg.textContent = "Failed to send message. Please try emailing directly.";
+                    msg.className = "mt-4 p-4 bg-red-500/20 text-red-400 rounded-lg text-center text-sm block";
+                } finally {
+                    submitBtn.disabled = false;
+                }
             });
         }
 
